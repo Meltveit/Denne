@@ -1,4 +1,3 @@
-// components/FileUpload.tsx
 import { useState } from "react";
 import { uploadFile } from "@/lib/firebase";
 
@@ -27,7 +26,7 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
   return (
     <div>
       <input type="file" onChange={handleFileChange} disabled={uploading} />
-      {uploading && <p>Laster opp...</p>}
+      {uploading && <p>Uploading...</p>}
     </div>
   );
 }

@@ -1,4 +1,3 @@
-// app/subscription/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -35,7 +34,7 @@ export default function SubscriptionPage() {
     <div className="min-h-screen bg-gray-100">
       <Header />
       <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6 text-center">Velg Abonnementsplan</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Choose Your Subscription Plan</h1>
 
         <div className="mb-8 flex justify-center">
           <select
@@ -43,9 +42,9 @@ export default function SubscriptionPage() {
             onChange={(e) => setBillingInterval(e.target.value as "monthly" | "3months" | "6months")}
             className="p-2 border rounded-lg"
           >
-            <option value="monthly">Månedlig</option>
-            <option value="3months">Hver 3. måned (5% rabatt)</option>
-            <option value="6months">Hver 6. måned (10% rabatt)</option>
+            <option value="monthly">Monthly</option>
+            <option value="3months">Every 3 months (5% discount)</option>
+            <option value="6months">Every 6 months (10% discount)</option>
           </select>
         </div>
 
@@ -57,14 +56,14 @@ export default function SubscriptionPage() {
             onClick={() => setSelectedPlan("plus")}
           >
             <h2 className="text-2xl font-bold mb-2">Plus Plan</h2>
-            <p className="text-xl">{getDiscountedPrice(299)} NOK/mnd</p>
+            <p className="text-xl">{getDiscountedPrice(299)} NOK/month</p>
             <p className="text-sm text-gray-600">
               Total: {getTotalPrice(299)} NOK for{" "}
-              {billingInterval === "3months" ? "3 måneder" : billingInterval === "6months" ? "6 måneder" : "1 måned"}
+              {billingInterval === "3months" ? "3 months" : billingInterval === "6months" ? "6 months" : "1 month"}
             </p>
             <ul className="mt-4 space-y-2">
-              <li>Økt synlighet i søkeresultater</li>
-              <li>Prioritert rangering</li>
+              <li>Increased visibility in search results</li>
+              <li>Priority ranking</li>
             </ul>
           </div>
 
@@ -75,15 +74,15 @@ export default function SubscriptionPage() {
             onClick={() => setSelectedPlan("premium")}
           >
             <h2 className="text-2xl font-bold mb-2">Premium Plan</h2>
-            <p className="text-xl">{getDiscountedPrice(499)} NOK/mnd</p>
+            <p className="text-xl">{getDiscountedPrice(499)} NOK/month</p>
             <p className="text-sm text-gray-600">
               Total: {getTotalPrice(499)} NOK for{" "}
-              {billingInterval === "3months" ? "3 måneder" : billingInterval === "6months" ? "6 måneder" : "1 måned"}
+              {billingInterval === "3months" ? "3 months" : billingInterval === "6months" ? "6 months" : "1 month"}
             </p>
             <ul className="mt-4 space-y-2">
-              <li>Økt synlighet i søkeresultater</li>
-              <li>Høyest prioritert rangering</li>
-              <li>AI-genererte nyhetsbrev</li>
+              <li>Increased visibility in search results</li>
+              <li>Highest priority ranking</li>
+              <li>AI-generated newsletters</li>
             </ul>
           </div>
         </div>
@@ -94,7 +93,7 @@ export default function SubscriptionPage() {
             selectedPlan ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-600"
           }`}
         >
-          Gå til Betaling
+          Proceed to Payment
         </button>
       </div>
     </div>

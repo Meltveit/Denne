@@ -1,18 +1,12 @@
-// components/Header.tsx
+"use client";
+
 import Link from "next/link";
-import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/useAuth";
+import { auth } from "@/lib/firebase";
 
 export default function Header() {
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+  const [user, loading] = useAuth();
 
   const handleSignOut = async () => {
     try {
@@ -22,29 +16,41 @@ export default function Header() {
     }
   };
 
+  const handleProfileClick = () => {
+    if (!user && !loading) {
+      alert("Please Sign In or Register");
+    }
+  };
+
   return (
     <header className="bg-blue-600 text-white p-4 fixed top-0 w-full z-10 shadow-md">
       <nav className="max-w-7xl mx-auto flex justify-between items-center">
         <Link href="/">
-          <h1 className="text-2xl font-bold">Min Plattform</h1>
+          <h1 className="text-2xl font-bold">My Platform</h1>
         </Link>
         <div className="flex gap-4 items-center">
-          <Link href="/map">Kart</Link>
-          <Link href="/posts">Innlegg</Link>
-          {user ? (
-            <>
-              <Link href={`/profile/${user.uid}`}>Profil</Link>
-              <Link href="/messages">Meldinger</Link>
-              <button onClick={handleSignOut} className="hover:underline">
-                Logg ut
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/login">Logg inn</Link>
-              <Link href="/register">Registrer</Link>
-            </>
-          )}
+          <Link href="/map">Map</Link>
+          <Link href="/posts">Posts</Link>
+          <div className="relative">
+            <button onClick={handleProfileClick} className="hover:underline">
+              Profile
+            </button>
+            {!user && !loading && (
+              <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-md">
+                <Link href="/login" className="block px-4 py-2 hover:bg-gray-100">Sign In</Link>
+                <Link href="/register" className="block px-4 py-2 hover:bg-gray-100">Register</Link>
+              </div>
+            )}
+            {user && !loading && (
+              <>
+                <Link href={`/profile/${user.uid}`}>Profile</Link>
+                <Link href="/messages">Messages</Link>
+                <button onClick={handleSignOut} className="hover:underline">
+                  Sign Out
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </nav>
     </header>

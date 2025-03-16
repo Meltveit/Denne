@@ -1,4 +1,3 @@
-// components/PostCard.tsx
 import Link from "next/link";
 import { Post } from "@/lib/types";
 
@@ -13,7 +12,7 @@ export default function PostCard({ post }: PostCardProps) {
       {post.image && <img src={post.image} alt="Post image" className="w-full h-40 object-cover mt-2 rounded" />}
       {post.file && (
         <a href={post.file} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-          Last ned fil
+          Download file
         </a>
       )}
       {post.link && (

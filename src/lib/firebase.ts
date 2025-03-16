@@ -1,35 +1,23 @@
-// lib/firebase.ts
 import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, query, where, Timestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useEffect, useState } from "react";
 import { Post } from "./types"; // Importer Post-typen
 
 const firebaseConfig = {
-  // Legg til din Firebase-konfigurasjon her
+  apiKey: "AIzaSyCyPn-Lhu7smXuYleDFBqwuiAH1r71Y4xs",
+  authDomain: "bsocial-5872f.firebaseapp.com",
+  projectId: "bsocial-5872f",
+  storageBucket: "bsocial-5872f.firebasestorage.app",
+  messagingSenderId: "680948415961",
+  appId: "1:680948415961:web:e3a115fd3e90bc080e6dc8",
+  measurementId: "G-P1R7R2T9VZ",
 };
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-
-// Hook for å håndtere autentiseringstilstand
-export const useAuth = () => {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  return [user, loading];
-};
 
 // Hjelpefunksjoner for å håndtere data
 export const createPost = async (post: Omit<Post, "id" | "timestamp">) => {

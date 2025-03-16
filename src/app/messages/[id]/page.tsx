@@ -1,125 +1,41 @@
-// app/messages/[id]/page.tsx
-"use client";
-
-import { useEffect, useState } from "react";
-import { useAuth, db } from "@/lib/firebase";
-import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, QueryDocumentSnapshot } from "firebase/firestore";
 import { Message } from "@/lib/types";
-import Header from "@/components/Header";
-import FileUpload from "@/components/FileUpload";
+import ChatComponent from "./ChatComponent";
 
-// Importer Next.js sine typer for dynamiske ruter
 import type { NextPage } from "next";
 
-// Definer props-typen med Next.js sine innebygde typer
+type SegmentParams = { id: string };
+
 interface ChatPageProps {
-  params: { id: string }; // Vi vet at params.id er en string i dette tilfellet
+  params: SegmentParams;
+}
+
+interface MessageDocument {
+  senderId: string;
+  receiverId: string;
+  content: string;
+  file?: string;
+  timestamp: number;
 }
 
 const ChatPage: NextPage<ChatPageProps> = ({ params }) => {
-  const [user, loading] = useAuth();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const messagesData = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() } as Message))
-        .filter(
-          (msg) =>
-            (msg.senderId === user.uid && msg.receiverId === params.id) ||
-            (msg.senderId === params.id && msg.receiverId === user.uid)
-        );
-      setMessages(messagesData);
-    });
-
-    return () => unsubscribe();
-  }, [user, params.id]);
-
-  const handleSendMessage = async () => {
-    if (!user || (!newMessage.trim() && !fileUrl)) return;
-
-    await addDoc(collection(db, "messages"), {
-      senderId: user.uid,
-      receiverId: params.id,
-      content: newMessage,
-      file: fileUrl || undefined,
-      timestamp: Date.now(),
-    });
-
-    setNewMessage("");
-    setFileUrl(null);
-  };
-
-  if (loading) return <div>Laster...</div>;
-  if (!user) return <div>Du må være logget inn for å se meldinger.</div>;
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <Header />
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.senderId === user.uid ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`p-3 rounded-lg ${
-                    msg.senderId === user.uid ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
-                  }`}
-                >
-                  <p>{msg.content}</p>
-                  {msg.file && (
-                    <a href={msg.file} target="_blank" rel="noopener noreferrer" className="underline">
-                      Last ned fil
-                    </a>
-                  )}
-                  <p className="text-xs mt-1">
-                    {new Date(msg.timestamp).toLocaleTimeString()}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 flex gap-2">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Skriv en melding..."
-              className="flex-1 p-2 border rounded-lg"
-            />
-            <FileUpload onUpload={(url) => setFileUrl(url)} />
-            <button
-              onClick={handleSendMessage}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <ChatComponent params={params} />;
 };
 
-// Legg til generateStaticParams for å indikere at params er statiske
 export async function generateStaticParams() {
-  // Her kan du hente en liste over mulige `id`-verdier fra databasen din
-  // For eksempel, hent alle chat-IDs fra Firebase
-  const chats = await collection(db, "messages").get();
-  const chatIds = chats.docs.map((doc) => doc.id);
+  const snapshot = await getDocs(collection(db, "messages"));
+  const messageIds = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data() as MessageDocument);
 
-  return chatIds.map((id) => ({
+  const uniqueReceiverIds = [...new Set(messageIds.map((msg) => msg.receiverId))].filter(
+    (id): id is string => id !== undefined && id !== null
+  );
+
+  return uniqueReceiverIds.map((id) => ({
     id,
   }));
 }
+
+export const dynamicParams = false;
 
 export default ChatPage;
